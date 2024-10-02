@@ -1,9 +1,10 @@
 package com.onlineshop.shop.controllers;
 
-import com.onlineshop.shop.dtos.ProductResponseSelf;
-import com.onlineshop.shop.exceptions.ProductNotPresentException;
-import com.onlineshop.shop.models.Product;
-import com.onlineshop.shop.services.ProductService;
+import com.onlineshop.shop.productcatalog.controllers.FakeProductController;
+import com.onlineshop.shop.productcatalog.dtos.ProductResponseSelf;
+import com.onlineshop.shop.productcatalog.exceptions.ProductNotPresentException;
+import com.onlineshop.shop.productcatalog.models.Product;
+import com.onlineshop.shop.productcatalog.services.FakeProductService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -16,15 +17,13 @@ import org.springframework.http.ResponseEntity;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
 class ProductControllerTest {
     @Autowired
-    ProductController productController;
+    FakeProductController productController;
 
     @MockBean
-    ProductService productService;
+    FakeProductService productService;
 
     @Test
     void getAllProducts() {
