@@ -28,10 +28,10 @@ public class CustomerUserDetails implements UserDetails {
 
     public CustomerUserDetails(User user){
         this.userName = user.getEmail();
-        this.password = user.getHashedPassword();
-        for(Role role : user.getRoles()){
-            authorityList.add(new CustomGrantedAuthority(role));
-        }
+        this.password = user.getPassword();
+//        for(String role : user.getRoles()){
+//            authorityList.add(new CustomGrantedAuthority(role));
+//        }
     }
 
     @Override

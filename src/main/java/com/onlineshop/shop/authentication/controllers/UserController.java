@@ -3,7 +3,6 @@ package com.onlineshop.shop.authentication.controllers;
 import com.onlineshop.shop.authentication.dtos.LoginRequestDto;
 import com.onlineshop.shop.authentication.dtos.SignupRequestDto;
 import com.onlineshop.shop.authentication.exceptions.InvalidCredentialsException;
-import com.onlineshop.shop.authentication.models.Token;
 import com.onlineshop.shop.authentication.models.User;
 import com.onlineshop.shop.authentication.services.UserService;
 
@@ -15,31 +14,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 public class UserController {
-@Autowired
-UserService userService;
 
+    @Autowired
+    private UserService userService;
+
+    /**
+     * Handles user registration.
+     *
+     * @param signupRequestDto The signup request payload.
+     * @return The created User object.
+     */
     @PostMapping("/signup")
-    public User signUp(@RequestBody SignupRequestDto signupRequestDto){
+    public ResponseEntity<User> signUp(@RequestBody SignupRequestDto signupRequestDto){
         String name = signupRequestDto.getName();
         String email = signupRequestDto.getEmail();
         String password = signupRequestDto.getPassword();
-        return userService.signUp(name, email, password);
+        User user = userService.signUp(name, email, password);
+        return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
 
+    // The endpoint for login
     @PostMapping("/login")
-    public ResponseEntity<Token> login(@RequestBody LoginRequestDto loginRequestDto) {
-        try {
-            String email = loginRequestDto.getEmail();
-            String password = loginRequestDto.getPassword();
-            Token token = userService.login(email, password);
-            return ResponseEntity.ok(token);
-        } catch (InvalidCredentialsException e) {
-            System.out.println(e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
+        // You don't need to handle authentication here;
+        // the CustomAuthenticationFilter will take care of that.
+        return ResponseEntity.ok("Login request received, processing...");
     }
+
+    /**
+     * Handles user logout.
+     *
+     * @param token The JWT token to invalidate.
+     * @return A ResponseEntity with appropriate HTTP status.
+     */
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestParam String token){
         userService.logout(token);

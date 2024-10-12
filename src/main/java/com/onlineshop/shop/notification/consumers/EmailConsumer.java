@@ -30,7 +30,7 @@ public class EmailConsumer {
         this.objectMapper = objectMapper;
     }
 
-    @KafkaListener(topics = "sendEmail", id = "emailConsumerGroup")
+   // @KafkaListener(topics = "sendEmail", id = "emailConsumerGroup")
     public void sendEmail(String message) {
         try {
             EmailFormat emailMessage = objectMapper.readValue(message, EmailFormat.class);

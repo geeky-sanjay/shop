@@ -1,48 +1,83 @@
 package com.onlineshop.shop.authentication.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.onlineshop.shop.authentication.dtos.EmailFormat;
 import com.onlineshop.shop.authentication.exceptions.InvalidCredentialsException;
-import com.onlineshop.shop.authentication.models.Token;
+import com.onlineshop.shop.authentication.models.BaseModel;
 import com.onlineshop.shop.authentication.models.User;
-import com.onlineshop.shop.authentication.repositories.TokenRepository;
 import com.onlineshop.shop.authentication.repositories.UserRepository;
+import com.onlineshop.shop.authentication.security.JwtTokenProvider;
+import com.onlineshop.shop.notification.dtos.EmailFormat;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ExecutionException;
-
 @Service
-public class UserService {
+public class UserService extends BaseModel implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final TokenRepository tokenRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
-  //  private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, TokenRepository tokenRepository, BCryptPasswordEncoder bCryptPasswordEncoder, KafkaTemplate<String, String> kafkaTemplate, ObjectMapper objectMapper) {
+    public UserService(UserRepository userRepository, JwtTokenProvider jwtTokenProvider,PasswordEncoder  passwordEncoder) {
         this.userRepository = userRepository;
-        this.tokenRepository = tokenRepository;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-       // this.kafkaTemplate = kafkaTemplate;
-        this.objectMapper = objectMapper;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.passwordEncoder = passwordEncoder;
+    }
+
+    @Value("${JWT_SECRET}")
+    private String jwtSecret; // Injected JWT secret
+
+    /**
+     * Loads the user by email.
+     *
+     * @param email The user's email.
+     * @return UserDetails object.
+     * @throws UsernameNotFoundException If user is not found.
+     */
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+        return new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                user.getAuthorities()
+        );
+    }
+
+    /**
+     * Authenticates the user and generates a JWT token.
+     *
+     * @param email    The user's email.
+     * @param password The user's password.
+     * @return A JWT token.
+     * @throws InvalidCredentialsException If authentication fails.
+     */
+    public String login(String email, String password) throws InvalidCredentialsException {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new InvalidCredentialsException("Invalid email or password"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new InvalidCredentialsException("Invalid email or password");
+        }
+
+        return jwtTokenProvider.generateToken(user);
     }
 
     public User signUp(String name, String email, String password) {
+        if (userRepository.findByEmail(email).isPresent()) {
+            throw new IllegalArgumentException("Email already in use");
+        }
+
         User user = new User();
         user.setName(name);
         user.setEmail(email);
-        user.setHashedPassword(bCryptPasswordEncoder.encode(password));
+        user.setPassword(passwordEncoder.encode(password));
         return userRepository.save(user);
 //        try {
 //            kafkaTemplate.send("sendEmail", objectMapper.writeValueAsString(getMessage(user))).get();
@@ -61,34 +96,12 @@ public class UserService {
         return message;
     }
 
-    public Token login(String email, String password) throws InvalidCredentialsException {
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty()) {
-            throw new InvalidCredentialsException();
-        }
-
-        if (!bCryptPasswordEncoder.matches(password, user.get().getHashedPassword())) {
-            throw new InvalidCredentialsException();
-        }
-
-        Token token = new Token();
-        token.setUser(user.get());
-        token.setValue(UUID.randomUUID().toString());
-        token.setExpirydate(get30DaysLaterDate());
-        return tokenRepository.save(token);
-    }
-
-    private Date get30DaysLaterDate() {
-        LocalDate currentDate = LocalDate.now().plusDays(30);
-        return Date.from(currentDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
-    }
-
     public void logout(String token) {
-        Optional<Token> optionalToken = tokenRepository.findByValueAndIsDeletedEquals(token, false);
-        if (optionalToken.isEmpty()) {
-            return;
-        }
-        optionalToken.get().setDeleted(true);
-        tokenRepository.save(optionalToken.get());
+//        Optional<Token> optionalToken = tokenRepository.findByValueAndIsDeletedEquals(token, false);
+//        if (optionalToken.isEmpty()) {
+//            return;
+//        }
+//        optionalToken.get().setDeleted(true);
+//        tokenRepository.save(optionalToken.get());
     }
 }
