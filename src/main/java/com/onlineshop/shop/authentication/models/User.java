@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @Getter
 @Setter
-@Entity
+@Entity(name="user_self")
 public class User extends BaseModel implements UserDetails {
 
     private String email;

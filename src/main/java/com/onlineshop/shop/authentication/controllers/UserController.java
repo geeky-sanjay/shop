@@ -29,12 +29,12 @@ public class UserController {
      * @return The created User object.
      */
     @PostMapping("/signup")
-    public ResponseEntity<User> signUp(@RequestBody SignupRequestDto signupRequestDto){
+    public ResponseEntity<?> signUp(@RequestBody SignupRequestDto signupRequestDto){
         String name = signupRequestDto.getName();
         String email = signupRequestDto.getEmail();
         String password = signupRequestDto.getPassword();
         User user = userService.signUp(name, email, password);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully");
     }
 
     // The endpoint for login

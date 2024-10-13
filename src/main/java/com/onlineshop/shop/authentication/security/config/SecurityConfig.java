@@ -3,7 +3,8 @@ package com.onlineshop.shop.authentication.security.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.onlineshop.shop.authentication.security.JwtTokenProvider;
 import com.onlineshop.shop.authentication.security.JwtTokenValidator;
-import com.onlineshop.shop.authentication.security.filter.CustomAuthenticationFilter;
+import com.onlineshop.shop.authentication.security.CustomAuthenticationProvider;
+import com.onlineshop.shop.authentication.services.CustomUserDetailsService;
 import com.onlineshop.shop.authentication.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,17 +20,14 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configuration.OAuth2AuthorizationServerConfiguration;
-import org.springframework.security.oauth2.server.authorization.config.annotation.web.configurers.OAuth2AuthorizationServerConfigurer;
-import org.springframework.security.oauth2.server.authorization.settings.AuthorizationServerSettings;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -44,11 +42,15 @@ public class SecurityConfig {
 
     private final UserService userService;
     private final ObjectMapper objectMapper;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    public SecurityConfig(@Lazy UserService userService, ObjectMapper objectMapper) {
+    public SecurityConfig(@Lazy UserService userService, ObjectMapper objectMapper, CustomUserDetailsService customUserDetailsService, JwtTokenProvider jwtTokenProvider) {
         this.userService = userService;
         this.objectMapper = objectMapper;
+        this.customUserDetailsService = customUserDetailsService;
+        this.jwtTokenProvider = jwtTokenProvider;
     }
 
     @Value("${JWT_SECRET}")
@@ -62,12 +64,7 @@ public class SecurityConfig {
     private static final String PRODUCTS_URL = "/products";
     private static final String CATEGORIES_URL = "/categories";
 
-    // PasswordEncoder Bean
-    @Bean
-    @Primary
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+
 
     // AuthenticationManager Bean
     @Bean
@@ -75,9 +72,11 @@ public class SecurityConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    // JwtTokenProvider Bean (already annotated with @Component, so no need to define here)
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
+    // Custom Authentication Provider Bean
+    @Bean
+    public CustomAuthenticationProvider customAuthenticationProvider() {
+        return new CustomAuthenticationProvider();
+    }
 
     // JwtTokenValidator Bean
     @Bean
@@ -91,40 +90,19 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // Adjust as needed
-        config.setAllowedMethods(Arrays.asList("GET","POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
 
-    @Bean
-    @Order(1)
-    public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
-        // Apply the default OAuth2 Authorization Server configuration
-        OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        http.getConfigurer(OAuth2AuthorizationServerConfigurer.class)
-                .oidc(Customizer.withDefaults());
-
-        // Configure exception handling
-        http.exceptionHandling(exceptions ->
-                        exceptions.defaultAuthenticationEntryPointFor(
-                                new LoginUrlAuthenticationEntryPoint(LOGIN_URL),
-                                new org.springframework.security.web.util.matcher.MediaTypeRequestMatcher(MediaType.TEXT_HTML))
-                )
-                .oauth2ResourceServer(resourceServer -> resourceServer
-                        .jwt(Customizer.withDefaults())
-                );
-
-        return http.build();
-    }
-
+    // API Security Filter Chain
     @Bean
     @Order(2)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, AuthenticationManager authManager, JwtTokenValidator jwtTokenValidator) throws Exception {
-        // Create and configure the custom authentication filter
-        CustomAuthenticationFilter customAuthFilter = new CustomAuthenticationFilter(LOGIN_URL, authManager, userService, objectMapper);
-        customAuthFilter.setFilterProcessesUrl(LOGIN_URL);
+        // Register the custom AuthenticationProvider
+        http.authenticationProvider(customAuthenticationProvider());
 
         http
                 .cors(Customizer.withDefaults()) // Apply CORS configuration
@@ -142,11 +120,9 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // Add the custom authentication filter before UsernamePasswordAuthenticationFilter
-                .addFilterBefore(customAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                // Add the JWT token validator after the custom authentication filter
-                .addFilterAfter(jwtTokenValidator, CustomAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable()) // Disable CSRF for APIs
+                // Add the JWT token validator after the authentication process
+                .addFilterAfter(jwtTokenValidator, UsernamePasswordAuthenticationFilter.class)
+                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for APIs
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                 );
@@ -154,21 +130,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        return NimbusJwtDecoder.withSecretKey(new SecretKeySpec(jwtSecret.getBytes(), "HMACSHA512")).build();
-    }
-
-    @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
-        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        authoritiesConverter.setAuthorityPrefix("ROLE_");
-        authoritiesConverter.setAuthoritiesClaimName("roles");
-        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
-        return converter;
-    }
-
+    // Default Security Filter Chain (lowest priority)
     @Bean
     @Order(3)
     public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -177,13 +139,25 @@ public class SecurityConfig {
                         .anyRequest().permitAll()
                 )
                 .formLogin(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable());
+                .csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
     }
 
+    // JWT Decoder Bean
     @Bean
-    public AuthorizationServerSettings authorizationServerSettings() {
-        return AuthorizationServerSettings.builder().build();
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withSecretKey(new SecretKeySpec(jwtSecret.getBytes(), "HMACSHA512")).build();
+    }
+
+    // JWT Authentication Converter Bean
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtAuthenticationConverter converter = new JwtAuthenticationConverter();
+        JwtGrantedAuthoritiesConverter authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthorityPrefix("ROLE_");
+        authoritiesConverter.setAuthoritiesClaimName("roles");
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        return converter;
     }
 }

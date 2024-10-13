@@ -1,6 +1,7 @@
 package com.onlineshop.shop.authentication.security.filter;
 
 import com.onlineshop.shop.authentication.exceptions.InvalidCredentialsException;
+import com.onlineshop.shop.authentication.models.User;
 import com.onlineshop.shop.authentication.services.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
@@ -11,11 +12,16 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class CustomAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
@@ -37,11 +43,17 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         String email = credentials.get("email");
         String password = credentials.get("password");
 
-        // Log received credentials for debugging (avoid logging passwords in production)
-        System.out.println("Attempting authentication for email: " + email + " pass" + password);
+        // Log received credentials for debugging
+        System.out.println("Attempting authentication for email: " + email);
 
+        // Create the authentication token
         UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(email, password);
-        return getAuthenticationManager().authenticate(authRequest);
+        System.out.println("Attempting authentication for authRequest: " + authRequest.getCredentials());
+
+        // Perform authentication
+        Authentication auth = getAuthenticationManager().authenticate(authRequest);
+        System.out.println("Authentication successful for user: " + auth.getName());
+        return auth;
     }
 
     @Override
@@ -51,11 +63,14 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
                                             Authentication authResult) throws IOException, ServletException {
         // Generate JWT token using UserService
         String email = authResult.getName();
-        String token;
+        List<GrantedAuthority> authorities = (List<GrantedAuthority>) authResult.getAuthorities();
+        String token = null;
+        System.out.println("auth before service" + authResult.getCredentials());
         try {
-            token = userService.login(email, (String) authResult.getCredentials());
+            // User user = userService.findByEmail(email); // Fetch user from the database
+            token = userService.login(email, (String) authResult.getCredentials()); // Call login method
         } catch (InvalidCredentialsException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Error during login: " + e.getMessage(), e);
         }
 
         // Return the token in the response body
@@ -76,5 +91,12 @@ public class CustomAuthenticationFilter extends AbstractAuthenticationProcessing
         response.setContentType("application/json");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
+    }
+
+    // Optional: Add a method to get authorities if needed
+    private List<GrantedAuthority> getAuthorities(User user) {
+        return user.getRoles().stream()
+                .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                .collect(Collectors.toList());
     }
 }
