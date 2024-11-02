@@ -38,11 +38,14 @@ public class UserController {
     }
 
     // The endpoint for login
-    @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> credentials) {
-        // You don't need to handle authentication here;
-        // the CustomAuthenticationFilter will take care of that.
-        return ResponseEntity.ok("Login request received, processing...");
+    @PostMapping("/auth/login")
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto credentials) {
+        try {
+            String token = userService.login(credentials.getEmail(), credentials.getPassword());
+            return ResponseEntity.ok(Map.of("token", token));
+        } catch (InvalidCredentialsException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+        }
     }
 
     /**

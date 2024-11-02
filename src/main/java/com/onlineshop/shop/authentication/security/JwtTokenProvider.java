@@ -2,6 +2,8 @@ package com.onlineshop.shop.authentication.security;
 
 import com.onlineshop.shop.authentication.models.User;
 import io.jsonwebtoken.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -15,6 +17,8 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
+
+    private static final Logger logger = LoggerFactory.getLogger(JwtTokenProvider.class);
 
     @Value("${JWT_SECRET}")
     private String jwtSecret;
@@ -36,9 +40,9 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationMs);
 
-        // Add roles as a claim
+        // Add roles as a claim, ensure roles are simple (e.g., "USER", "ADMIN")
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles", user.getRoles());
+        claims.put("roles", user.getRoles().stream().map(role -> role.replace("ROLE_", "")).collect(Collectors.toList()));
 
         return Jwts.builder()
                 .setSubject(user.getEmail())
@@ -62,11 +66,18 @@ public class JwtTokenProvider {
                     .build()
                     .parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException ex) {
-            // Log the exception as needed
-            System.err.println("Invalid JWT token: " + ex.getMessage());
-            return false;
+        } catch (ExpiredJwtException ex) {
+            logger.error("Token expired: {}", ex.getMessage());
+        } catch (UnsupportedJwtException ex) {
+            logger.error("Unsupported JWT token: {}", ex.getMessage());
+        } catch (MalformedJwtException ex) {
+            logger.error("Invalid JWT token: {}", ex.getMessage());
+        } catch (SignatureException ex) {
+            logger.error("Invalid JWT signature: {}", ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            logger.error("JWT claims string is empty: {}", ex.getMessage());
         }
+        return false;
     }
 
     /**
@@ -84,6 +95,7 @@ public class JwtTokenProvider {
 
         String email = claims.getSubject();
 
+        // Extract roles from claims and add "ROLE_" prefix if needed
         @SuppressWarnings("unchecked")
         List<String> roles = claims.get("roles", List.class);
 

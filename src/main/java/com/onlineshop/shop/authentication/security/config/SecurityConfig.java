@@ -59,7 +59,7 @@ public class SecurityConfig {
     @Value("${JWT_EXPIRATION_MS}")
     private long jwtExpirationMs;
 
-    private static final String LOGIN_URL = "/login";
+    private static final String LOGIN_URL = "/auth/login";
     private static final String SIGNUP_URL = "/signup";
     private static final String PRODUCTS_URL = "/products";
     private static final String CATEGORIES_URL = "/categories";
@@ -99,7 +99,7 @@ public class SecurityConfig {
 
     // API Security Filter Chain
     @Bean
-    @Order(2)
+   // @Order(2)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, AuthenticationManager authManager, JwtTokenValidator jwtTokenValidator) throws Exception {
         // Register the custom AuthenticationProvider
         http.authenticationProvider(customAuthenticationProvider());
