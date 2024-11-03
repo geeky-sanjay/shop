@@ -60,7 +60,7 @@ public class UserService extends BaseModel implements UserDetailsService {
         }
 
         // Generate and return the JWT token
-        return jwtTokenProvider.generateToken(user);
+        return jwtTokenProvider.generateToken(user.getEmail());
     }
 
     /**

@@ -14,7 +14,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -64,8 +63,6 @@ public class SecurityConfig {
     private static final String PRODUCTS_URL = "/products";
     private static final String CATEGORIES_URL = "/categories";
 
-
-
     // AuthenticationManager Bean
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
@@ -99,9 +96,8 @@ public class SecurityConfig {
 
     // API Security Filter Chain
     @Bean
-   // @Order(2)
+    @Order(2)
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http, AuthenticationManager authManager, JwtTokenValidator jwtTokenValidator) throws Exception {
-        // Register the custom AuthenticationProvider
         http.authenticationProvider(customAuthenticationProvider());
 
         http
@@ -120,7 +116,6 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                // Add the JWT token validator after the authentication process
                 .addFilterAfter(jwtTokenValidator, UsernamePasswordAuthenticationFilter.class)
                 .csrf(AbstractHttpConfigurer::disable) // Disable CSRF for APIs
                 .oauth2ResourceServer(oauth2 -> oauth2
