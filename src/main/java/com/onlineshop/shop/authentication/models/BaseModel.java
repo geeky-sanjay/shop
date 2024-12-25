@@ -13,5 +13,5 @@ import lombok.Setter;
 public class BaseModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public long id;
+    public Long id;
 }

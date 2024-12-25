@@ -1,9 +1,9 @@
 package com.onlineshop.shop.productcatalog.services;
 
+import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import com.onlineshop.shop.productcatalog.dtos.CategoryRequestDto;
 import com.onlineshop.shop.productcatalog.dtos.ProductRequestDto;
 import com.onlineshop.shop.productcatalog.exceptions.CategoryNotPresentException;
-import com.onlineshop.shop.productcatalog.exceptions.ProductNotPresentException;
 import com.onlineshop.shop.productcatalog.models.Category;
 import com.onlineshop.shop.productcatalog.models.Product;
 import com.onlineshop.shop.productcatalog.repositories.CategoryRepository;
@@ -31,9 +31,9 @@ public class ProductService implements IProductService {
     public Page<Product> getAllProducts(int pageNo, int pageSize, String sortBy) {
         return productRepository.findAll(PageRequest.of(pageNo, pageSize, Sort.by(sortBy)));
     }
-    private Product setProduct(Product product, ProductRequestDto requestDto) throws ProductNotPresentException {
+    private Product setProduct(Product product, ProductRequestDto requestDto) throws ResourceNotFoundException {
         Category category = categoryRepository.findById(requestDto.getCategoryId())
-                .orElseThrow(ProductNotPresentException::new);
+                .orElseThrow(()->new ResourceNotFoundException("Product not found"));
         product.setName(requestDto.getTitle());
         product.setPrice(requestDto.getPrice());
         product.setDescription(requestDto.getDescription());
@@ -42,28 +42,28 @@ public class ProductService implements IProductService {
         return product;
     }
     @Override
-    public Product addProduct(ProductRequestDto reqBody) throws ProductNotPresentException {
+    public Product addProduct(ProductRequestDto reqBody) throws  ResourceNotFoundException{
         Product product = new Product();
         return productRepository.save(setProduct(product, reqBody));
     }
 
     @Override
-    public Product updateProduct( Long id, ProductRequestDto requestDto) throws ProductNotPresentException{
-        Product product = productRepository.findById(id).orElseThrow(ProductNotPresentException::new);
+    public Product updateProduct( Long id, ProductRequestDto requestDto) throws ResourceNotFoundException{
+        Product product = productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Product not found"));
         return productRepository.save(setProduct(product, requestDto));
     }
 
     @Override
-    public Product getSingleProduct(Long id) throws ProductNotPresentException {
-        return productRepository.findById(id).orElseThrow(ProductNotPresentException::new);
+    public Product getSingleProduct(Long id) throws ResourceNotFoundException {
+        return productRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Product not found"));
     }
 
     @Override
-    public void deleteProduct(Long id) throws ProductNotPresentException {
+    public void deleteProduct(Long id) throws ResourceNotFoundException {
         if (productRepository.existsById(id)) {
             productRepository.deleteById(id);
         } else {
-            throw new ProductNotPresentException();
+            throw new ResourceNotFoundException("Product not found");
         }
     }
 

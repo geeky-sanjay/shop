@@ -5,13 +5,15 @@ import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Entity
 @Getter
 @Setter
 public class Product extends BaseModel {
     private String description;
     private String image;
-    private float price;
+    private BigDecimal price;
 
     @ManyToOne
     private Category category;

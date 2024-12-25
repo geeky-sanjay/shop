@@ -1,5 +1,6 @@
 package com.onlineshop.shop.productcatalog.services;
 
+import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import com.onlineshop.shop.productcatalog.dtos.ProductRequestDto;
 import com.onlineshop.shop.productcatalog.dtos.ProductResponseDto;
 import com.onlineshop.shop.productcatalog.exceptions.ProductNotPresentException;
@@ -21,7 +22,7 @@ public class FakeProductService implements IFakeProductService {
     @Override
     public Product getSingleProduct(Long id) throws ProductNotPresentException {
         if(id>20 && id<=40){
-            throw new ProductNotPresentException();
+            throw new ResourceNotFoundException("Product not found");
         }
         if(id>40){
             throw new ArithmeticException();

@@ -4,6 +4,7 @@ import com.onlineshop.shop.authentication.security.jwt.AuthTokenFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -54,6 +55,11 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    // URLS
+    private static final String LOGIN_URL = "/auth/login";
+    private static final String SIGNUP_URL = "/signup";
+    private static final String PRODUCTS_URL = "/products";
+    private static final String CATEGORIES_URL = "/categories";
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -61,8 +67,17 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll()
+                        auth.requestMatchers("/api/auth/**").permitAll() // It will cover all public auth urls
                                 .requestMatchers("/api/test/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, PRODUCTS_URL, PRODUCTS_URL + "/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, PRODUCTS_URL).authenticated()
+                                .requestMatchers(HttpMethod.PUT, PRODUCTS_URL + "/**").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, PRODUCTS_URL + "/**").authenticated()
+                                .requestMatchers(HttpMethod.GET, CATEGORIES_URL, CATEGORIES_URL + "/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, CATEGORIES_URL).authenticated()
+                                .requestMatchers(HttpMethod.PUT, CATEGORIES_URL + "/**").authenticated()
+                                .requestMatchers(HttpMethod.DELETE, CATEGORIES_URL + "/**").authenticated()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                 );
 
