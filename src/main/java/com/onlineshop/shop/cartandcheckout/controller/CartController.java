@@ -1,8 +1,8 @@
 package com.onlineshop.shop.cartandcheckout.controller;
 
-import com.onlineshop.shop.cartandcheckout.dtos.ApiResponse;
 import com.onlineshop.shop.cartandcheckout.models.Cart;
 import com.onlineshop.shop.cartandcheckout.service.ICartService;
+import com.onlineshop.shop.common.dtos.ApiResponse;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

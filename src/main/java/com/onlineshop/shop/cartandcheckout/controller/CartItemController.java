@@ -1,8 +1,8 @@
 package com.onlineshop.shop.cartandcheckout.controller;
 
-import com.onlineshop.shop.cartandcheckout.dtos.ApiResponse;
 import com.onlineshop.shop.cartandcheckout.service.ICartItemService;
 import com.onlineshop.shop.cartandcheckout.service.ICartService;
+import com.onlineshop.shop.common.dtos.ApiResponse;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import com.onlineshop.shop.productcatalog.exceptions.ProductNotPresentException;
 import com.onlineshop.shop.productcatalog.services.IProductService;

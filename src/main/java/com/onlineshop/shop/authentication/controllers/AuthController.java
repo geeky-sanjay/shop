@@ -24,11 +24,11 @@ import com.onlineshop.shop.authentication.models.ERole;
 import com.onlineshop.shop.authentication.models.Role;
 import com.onlineshop.shop.user.models.User;
 import com.onlineshop.shop.authentication.dtos.request.LoginRequest;
-import com.onlineshop.shop.authentication.dtos.request.SignupRequest;
+import com.onlineshop.shop.user.dtos.SignupRequest;
 import com.onlineshop.shop.authentication.dtos.response.JwtResponse;
 import com.onlineshop.shop.authentication.dtos.response.MessageResponse;
 import com.onlineshop.shop.authentication.repositories.RoleRepository;
-import com.onlineshop.shop.authentication.repositories.UserRepository;
+import com.onlineshop.shop.user.repositories.UserRepository;
 import com.onlineshop.shop.authentication.security.jwt.JwtUtils;
 import com.onlineshop.shop.authentication.security.services.UserDetailsImpl;
 
@@ -87,9 +87,16 @@ public class AuthController {
         }
 
         // Create new user's account
-        User user = new User(signUpRequest.getUsername(),
-                signUpRequest.getEmail(),
-                encoder.encode(signUpRequest.getPassword()));
+        // User user = new User(signUpRequest.getUsername(),
+        // signUpRequest.getEmail(),
+        // encoder.encode(signUpRequest.getPassword()));
+
+        User user = new User();
+        user.setFirstName(signUpRequest.getFirstName());
+        user.setLastName(signUpRequest.getLastName());
+        user.setUsername(signUpRequest.getUsername());
+        user.setEmail(signUpRequest.getEmail());
+        user.setPassword(encoder.encode(signUpRequest.getPassword()));
 
         Set<String> strRoles = signUpRequest.getRole();
         Set<Role> roles = new HashSet<>();

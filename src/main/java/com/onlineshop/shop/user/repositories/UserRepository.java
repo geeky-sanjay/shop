@@ -1,4 +1,4 @@
-package com.onlineshop.shop.authentication.repositories;
+package com.onlineshop.shop.user.repositories;
 
 import java.util.Optional;
 

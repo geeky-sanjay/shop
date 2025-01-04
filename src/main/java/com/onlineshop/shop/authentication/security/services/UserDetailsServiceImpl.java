@@ -1,7 +1,7 @@
 package com.onlineshop.shop.authentication.security.services;
 
 import com.onlineshop.shop.user.models.User;
-import com.onlineshop.shop.authentication.repositories.UserRepository;
+import com.onlineshop.shop.user.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

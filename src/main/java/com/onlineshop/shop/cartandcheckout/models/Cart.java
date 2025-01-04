@@ -15,7 +15,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class Cart extends BaseModel {
-    private Long userId;
+    // private Long userId;
     private BigDecimal totalAmount = BigDecimal.ZERO;
     // - `mappedBy = "cart"`: The "cart" field in the associated entity owns the relationship.
     // - `cascade = CascadeType.ALL`: Cascades all operations to associated entities.

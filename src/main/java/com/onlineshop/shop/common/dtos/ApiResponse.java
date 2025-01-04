@@ -1,4 +1,4 @@
-package com.onlineshop.shop.cartandcheckout.dtos;
+package com.onlineshop.shop.common.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

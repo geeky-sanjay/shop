@@ -1,5 +1,6 @@
 package com.onlineshop.shop.authentication.security.services;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -17,13 +18,14 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 @Getter
 @Setter
 public class UserDetailsImpl implements UserDetails {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
-
     private String username;
-
     private String email;
+    private String firstName;
+    private String lastName;
 
     @JsonIgnore
     private String password;

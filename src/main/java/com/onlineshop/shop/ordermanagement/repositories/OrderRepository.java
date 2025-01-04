@@ -1,4 +1,4 @@
-package com.onlineshop.shop.ordermanagement.repository;
+package com.onlineshop.shop.ordermanagement.repositories;
 
 import com.onlineshop.shop.ordermanagement.models.Order;
 import org.springframework.data.jpa.repository.JpaRepository;

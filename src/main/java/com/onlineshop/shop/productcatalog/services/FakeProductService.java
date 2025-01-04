@@ -73,7 +73,7 @@ public class FakeProductService implements IFakeProductService {
         Product product = new Product();
         product.setId(responseDto.getId());
         product.setName(responseDto.getTitle());
-        product.setImage(responseDto.getImage());
+        //product.setImage(responseDto.getImage());
         product.setPrice(responseDto.getPrice());
         product.setDescription(responseDto.getDescription());
         product.setCategory(new Category());
