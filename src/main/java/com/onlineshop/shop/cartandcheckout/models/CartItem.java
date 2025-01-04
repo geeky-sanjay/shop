@@ -1,5 +1,6 @@
 package com.onlineshop.shop.cartandcheckout.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.onlineshop.shop.authentication.models.BaseModel;
 import com.onlineshop.shop.productcatalog.models.Product;
 import jakarta.persistence.CascadeType;
@@ -27,6 +28,7 @@ public class CartItem extends BaseModel {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "cart_id")
     private Cart cart;

@@ -6,6 +6,7 @@ import com.onlineshop.shop.cartandcheckout.repositories.CartRepository;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,6 +27,7 @@ public class CartService implements ICartService {
         return cartRepository.save(cart);
     }
 
+    @Transactional
     @Override
     public void clearCart(Long cartId) {
         Cart cart = getCart(cartId);
@@ -46,7 +48,6 @@ public class CartService implements ICartService {
         Long newCartId = cartIdGenerator.incrementAndGet();
         newCart.setId(newCartId);
         return cartRepository.save(newCart).getId();
-
     }
 
     @Override

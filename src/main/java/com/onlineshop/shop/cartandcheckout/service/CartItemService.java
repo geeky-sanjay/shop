@@ -35,14 +35,7 @@ public class CartItemService implements ICartItemService {
                 .stream()
                 .filter(item -> item.getProduct().getId().equals(productId)).
                 findFirst().orElse(new CartItem());
-        if (Long.valueOf(cartItem.getId()) != null) {
-            cartItem.setQuantity(cartItem.getQuantity() + quantity);
-        } else {
-            cartItem.setProduct(product);
-            cartItem.setQuantity(quantity);
-            cartItem.setUnitPrice(product.getPrice());
-            cartItem.setCart(cart);
-        }
+        cartItem.setQuantity(cartItem.getQuantity() + quantity);
         cartItem.setTotalPrice();
         cart.addItem(cartItem);
 

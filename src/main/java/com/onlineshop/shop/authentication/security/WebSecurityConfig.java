@@ -10,6 +10,8 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,11 +22,11 @@ import com.onlineshop.shop.authentication.security.jwt.AuthEntryPointJwt;
 import com.onlineshop.shop.authentication.security.services.UserDetailsServiceImpl;
 
 @Configuration
-@EnableMethodSecurity
 // (securedEnabled = true,
 // jsr250Enabled = true,
 // prePostEnabled = true) // by default
-public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
+@EnableWebSecurity(debug = true)
+public class WebSecurityConfig { // extends WebSecurityConfigureAdapter {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
@@ -63,21 +65,22 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+        http.csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll() // It will cover all public auth urls
                                 .requestMatchers("/api/test/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, PRODUCTS_URL, PRODUCTS_URL + "/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/products", "/products/**").permitAll()
+                                .requestMatchers(HttpMethod.GET,  "/products").permitAll()
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, PRODUCTS_URL).authenticated()
                                 .requestMatchers(HttpMethod.PUT, PRODUCTS_URL + "/**").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, PRODUCTS_URL + "/**").authenticated()
-                                .requestMatchers(HttpMethod.GET, CATEGORIES_URL, CATEGORIES_URL + "/**").permitAll()
+                                .requestMatchers(HttpMethod.GET, CATEGORIES_URL + "/**").permitAll()
                                 .requestMatchers(HttpMethod.POST, CATEGORIES_URL).authenticated()
                                 .requestMatchers(HttpMethod.PUT, CATEGORIES_URL + "/**").authenticated()
                                 .requestMatchers(HttpMethod.DELETE, CATEGORIES_URL + "/**").authenticated()
-                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                                 .anyRequest().authenticated()
                 );
 

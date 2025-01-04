@@ -1,5 +1,6 @@
 package com.onlineshop.shop.productcatalog.controllers;
 
+import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import com.onlineshop.shop.productcatalog.dtos.ProductRequestDto;
 import com.onlineshop.shop.productcatalog.dtos.ProductResponseSelf;
 import com.onlineshop.shop.productcatalog.exceptions.ProductNotPresentException;
@@ -35,9 +36,13 @@ public class ProductController {
     }
 
     @GetMapping("/products/{id}")
-    public ResponseEntity<ProductResponseSelf> getSingleProduct(@PathVariable("id") Long id) throws ProductNotPresentException {
-        Product product = productService.getSingleProduct(id);
-        return new ResponseEntity<>(new ProductResponseSelf(product, "Success"),HttpStatus.OK);
+    public ResponseEntity<ProductResponseSelf> getSingleProduct(@PathVariable("id") Long id) {
+        try {
+            Product product = productService.getSingleProduct(id);
+            return new ResponseEntity<>(new ProductResponseSelf(product, "Success"), HttpStatus.OK);
+        } catch (ResourceNotFoundException ex) {
+            return new ResponseEntity<>(new ProductResponseSelf(null, ex.getMessage()), HttpStatus.NOT_FOUND);
+        }
     }
 
     @PutMapping("/products/{id}")
