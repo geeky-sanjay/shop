@@ -1,4 +1,4 @@
-package com.onlineshop.shop.productcatalog.models;
+package com.onlineshop.shop.common.models;
 
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

@@ -1,6 +1,6 @@
 package com.onlineshop.shop.ordermanagement.models;
 
-import com.onlineshop.shop.authentication.models.User;
+import com.onlineshop.shop.user.models.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

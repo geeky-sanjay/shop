@@ -1,7 +1,7 @@
 package com.onlineshop.shop.cartandcheckout.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.onlineshop.shop.authentication.models.BaseModel;
+import com.onlineshop.shop.common.models.BaseModel;
 import com.onlineshop.shop.productcatalog.models.Product;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;

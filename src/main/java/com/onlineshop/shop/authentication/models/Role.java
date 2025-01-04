@@ -1,5 +1,6 @@
 package com.onlineshop.shop.authentication.models;
 
+import com.onlineshop.shop.common.models.BaseModel;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.Setter;

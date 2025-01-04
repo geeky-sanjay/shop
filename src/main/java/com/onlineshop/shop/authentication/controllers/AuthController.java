@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.onlineshop.shop.authentication.models.ERole;
 import com.onlineshop.shop.authentication.models.Role;
-import com.onlineshop.shop.authentication.models.User;
+import com.onlineshop.shop.user.models.User;
 import com.onlineshop.shop.authentication.dtos.request.LoginRequest;
 import com.onlineshop.shop.authentication.dtos.request.SignupRequest;
 import com.onlineshop.shop.authentication.dtos.response.JwtResponse;

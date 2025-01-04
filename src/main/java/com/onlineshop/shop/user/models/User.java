@@ -1,10 +1,12 @@
-package com.onlineshop.shop.authentication.models;
+package com.onlineshop.shop.user.models;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.onlineshop.shop.authentication.models.Role;
 import com.onlineshop.shop.cartandcheckout.models.Cart;
+import com.onlineshop.shop.common.models.BaseModel;
 import com.onlineshop.shop.ordermanagement.models.Order;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -25,7 +27,7 @@ import lombok.Setter;
                 @UniqueConstraint(columnNames = "username"),
                 @UniqueConstraint(columnNames = "email")
         })
-public class User extends  BaseModel {
+public class User extends BaseModel {
 
     private String firstName;
     private String lastName;

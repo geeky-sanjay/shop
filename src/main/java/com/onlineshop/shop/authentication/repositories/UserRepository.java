@@ -2,7 +2,7 @@ package com.onlineshop.shop.authentication.repositories;
 
 import java.util.Optional;
 
-import com.onlineshop.shop.authentication.models.User;
+import com.onlineshop.shop.user.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
