@@ -17,7 +17,7 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${api.prefix}/users")
+@RequestMapping("${api_prefix}/users")
 public class UserController {
     private final IUserService userService;
 

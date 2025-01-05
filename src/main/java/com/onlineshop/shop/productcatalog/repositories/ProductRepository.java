@@ -13,5 +13,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     Product findByName(String name);
     Product findByPrice(Float price);
     Page<Product> findAll(Pageable pageable);
+    boolean existsByNameAndBrand(String name, String brand);
 }
 

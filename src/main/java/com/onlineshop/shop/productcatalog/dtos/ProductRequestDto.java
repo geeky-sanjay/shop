@@ -1,18 +1,19 @@
 package com.onlineshop.shop.productcatalog.dtos;
 
-import lombok.Getter;
-import lombok.Setter;
+import com.onlineshop.shop.productcatalog.models.Category;
+import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
 
-@Getter
-@Setter
+@Data
 public class ProductRequestDto {
-    private String title;
+    private String name;
+    private String brand;
     private BigDecimal price;
+    private int inventory;
     private String description;
-    // private String category;
-    private Long categoryId;
-    private String image;
+    private Category category;
+    private List<ImageDto> images;
 }
 

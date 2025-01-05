@@ -1,5 +1,6 @@
 package com.onlineshop.shop.productcatalog.models;
 
+import com.onlineshop.shop.common.models.BaseModel;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,10 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @Entity
-public class Product {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Product extends BaseModel {
     private String name;
     private String brand;
     private BigDecimal price;

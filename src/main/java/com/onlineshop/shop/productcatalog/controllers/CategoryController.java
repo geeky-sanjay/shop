@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequestMapping("${api_prefix}/categories")
 public class CategoryController {
 
     private final CategoryService categoryService;
@@ -22,33 +23,33 @@ public class CategoryController {
         this.categoryService = categoryService;
     }
 
-    @GetMapping("/categories")
+    @GetMapping("/all")
     public Page<Category> getAllCategories(@RequestParam("pageNo") int pageNo,
                                         @RequestParam("pageSize") int pageSize,
                                         @RequestParam("sortBy") String sortBy){
         return categoryService.getAllCategories(pageNo, pageSize, sortBy);
     }
 
-    @PostMapping("/categories")
+    @PostMapping("/add")
     public ResponseEntity<CategoryResponseSelf> addCategory(@RequestBody CategoryRequestDto req) {
         Category category =  categoryService.addCategory(req);
         CategoryResponseSelf responseDto = new CategoryResponseSelf(category, "Category added successfully");
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }
 
-    @GetMapping("/categories/{id}")
+    @GetMapping("/category/{id}/category")
     public ResponseEntity<CategoryResponseSelf> getSingleCategory(@PathVariable("id") Long id) throws ProductNotPresentException, CategoryNotPresentException {
         Category category = categoryService.getSingleCategory(id);
         return new ResponseEntity<>(new CategoryResponseSelf(category, "Success"),HttpStatus.OK);
     }
 
-    @PutMapping("/categories/{id}")
+    @PutMapping("/category/{id}/update")
     public ResponseEntity<Category> updateCategory(@PathVariable Long id, @RequestBody CategoryRequestDto requestDto) throws ProductNotPresentException, CategoryNotPresentException {
         Category category = categoryService.updateCategory(id, requestDto);
         return new ResponseEntity<>(category, HttpStatus.OK);
     }
 
-    @DeleteMapping("/categories/{id}")
+    @DeleteMapping("/category/{id}/delete")
     public ResponseEntity<CategoryResponseSelf> deleteCategory(@PathVariable Long id) throws ProductNotPresentException, CategoryNotPresentException {
         categoryService.deleteCategory(id);
         CategoryResponseSelf responseDto = new CategoryResponseSelf(null, "Category deleted successfully");

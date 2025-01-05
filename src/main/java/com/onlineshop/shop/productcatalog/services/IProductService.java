@@ -1,6 +1,7 @@
 package com.onlineshop.shop.productcatalog.services;
 
 import com.onlineshop.shop.productcatalog.dtos.CategoryRequestDto;
+import com.onlineshop.shop.productcatalog.dtos.ProductDto;
 import com.onlineshop.shop.productcatalog.dtos.ProductRequestDto;
 import com.onlineshop.shop.productcatalog.exceptions.CategoryNotPresentException;
 import com.onlineshop.shop.productcatalog.exceptions.ProductNotPresentException;
@@ -14,7 +15,10 @@ public interface IProductService {
     Page<Product> getAllProducts(int pageNo, int pageSize, String sortBy);
     Product addProduct( ProductRequestDto reqBody) throws ProductNotPresentException;
     Product updateProduct( Long id, ProductRequestDto requestDto) throws ProductNotPresentException;
-    Product getSingleProduct(Long id) throws ProductNotPresentException;
-    void deleteProduct(Long id) throws  ProductNotPresentException;
+    Product productRepository(Long id);
+   Product getProductById(Long id);
+   void deleteProduct(Long id) throws  ProductNotPresentException;
+
+    ProductDto convertToDto(Product product);
 }
 

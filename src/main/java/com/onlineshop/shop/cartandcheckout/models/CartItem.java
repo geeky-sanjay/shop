@@ -34,6 +34,6 @@ public class CartItem extends BaseModel {
     private Cart cart;
 
     public void setTotalPrice(){
-        this.totalPrice = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
+        this.totalPrice = this.unitPrice.multiply(new BigDecimal(quantity));
     }
 }

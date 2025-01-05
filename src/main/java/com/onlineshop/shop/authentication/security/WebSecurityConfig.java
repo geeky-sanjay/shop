@@ -1,7 +1,9 @@
 package com.onlineshop.shop.authentication.security;
 
 import com.onlineshop.shop.authentication.security.jwt.AuthTokenFilter;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -58,10 +60,25 @@ public class WebSecurityConfig { // extends WebSecurityConfigureAdapter {
         return new BCryptPasswordEncoder();
     }
     // URLS
-    private static final String LOGIN_URL = "/auth/login";
-    private static final String SIGNUP_URL = "/signup";
-    private static final String PRODUCTS_URL = "/products";
-    private static final String CATEGORIES_URL = "/categories";
+    // Inject the property value
+    @Value("${api_prefix}")
+    private String apiPrefix;
+
+    // Instance fields for URLs
+    private String authUrl;
+    private String productsUrl;
+    private String categoriesUrl;
+    private String cartItemUrl;
+    private String cartUrl;
+    // Initialize URLs after apiPrefix is injected
+    @PostConstruct
+    public void init() {
+        this.authUrl = apiPrefix + "/auth";
+        this.productsUrl = apiPrefix + "/products";
+        this.categoriesUrl = apiPrefix + "/categories";
+        this.cartItemUrl = apiPrefix + "/cartItems";
+        this.cartUrl = apiPrefix + "/cart";
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -69,19 +86,21 @@ public class WebSecurityConfig { // extends WebSecurityConfigureAdapter {
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/auth/**").permitAll() // It will cover all public auth urls
-                                .requestMatchers("/api/test/**").permitAll()
-                                .requestMatchers(HttpMethod.GET, "/products", "/products/**").permitAll()
-                                .requestMatchers(HttpMethod.GET,  "/products").permitAll()
+                        auth.requestMatchers(authUrl + "/**").permitAll() // It will cover all public auth urls
+                                .requestMatchers("/api/**").permitAll()
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, PRODUCTS_URL).authenticated()
-                                .requestMatchers(HttpMethod.PUT, PRODUCTS_URL + "/**").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, PRODUCTS_URL + "/**").authenticated()
-                                .requestMatchers(HttpMethod.GET, CATEGORIES_URL + "/**").permitAll()
-                                .requestMatchers(HttpMethod.POST, CATEGORIES_URL).authenticated()
-                                .requestMatchers(HttpMethod.PUT, CATEGORIES_URL + "/**").authenticated()
-                                .requestMatchers(HttpMethod.DELETE, CATEGORIES_URL + "/**").authenticated()
-                                .anyRequest().authenticated()
+//                                .requestMatchers(HttpMethod.GET, productsUrl + "/**").permitAll()
+//                                .requestMatchers(HttpMethod.GET,  cartUrl + "/**").permitAll()
+//                                .requestMatchers(HttpMethod.GET,  cartItemUrl + "/**").permitAll()
+//                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+//                                .requestMatchers(HttpMethod.POST, productsUrl).authenticated()
+//                                .requestMatchers(HttpMethod.PUT, productsUrl + "/**").authenticated()
+//                                .requestMatchers(HttpMethod.DELETE, productsUrl + "/**").authenticated()
+//                                .requestMatchers(HttpMethod.GET, categoriesUrl + "/**").permitAll()
+//                                .requestMatchers(HttpMethod.POST, categoriesUrl).authenticated()
+//                                .requestMatchers(HttpMethod.PUT, categoriesUrl + "/**").authenticated()
+//                                .requestMatchers(HttpMethod.DELETE, categoriesUrl + "/**").authenticated()
+                                    .anyRequest().permitAll()
                 );
 
         http.authenticationProvider(authenticationProvider());

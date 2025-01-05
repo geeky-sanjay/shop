@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("api/cart")
+@RequestMapping("${api_prefix}/cart")
 public class CartController {
     private final ICartService cartService;
 

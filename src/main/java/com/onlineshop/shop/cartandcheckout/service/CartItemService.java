@@ -30,12 +30,20 @@ public class CartItemService implements ICartItemService {
         // 5. If it doesn't exist, add the product to the cart
 
         Cart cart = cartService.getCart(cartId);
-        Product product = productService.getSingleProduct(productId);
+        Product product = productService.getProductById(productId);
         CartItem cartItem = cart.getCartItems()
                 .stream()
-                .filter(item -> item.getProduct().getId().equals(productId)).
-                findFirst().orElse(new CartItem());
-        cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                .filter(item -> item.getProduct().getId().equals(productId))
+                .findFirst().orElse(new CartItem());
+        if (cartItem.getId() == null) {
+            cartItem.setCart(cart);
+            cartItem.setProduct(product);
+            cartItem.setQuantity(quantity);
+            cartItem.setUnitPrice(product.getPrice());
+        }
+        else {
+            cartItem.setQuantity(cartItem.getQuantity() + quantity);
+        }
         cartItem.setTotalPrice();
         cart.addItem(cartItem);
 
@@ -52,7 +60,7 @@ public class CartItemService implements ICartItemService {
         // 5. If it doesn't exist, throw an exception
 
         Cart cart = cartService.getCart(cartId);
-        Product product = productService.getSingleProduct(productId);
+        Product product = productService.getProductById(productId);
         CartItem cartItem = getCartItem(cartId, productId);
         cart.removeItem(cartItem);
         cartItemRepository.delete(cartItem);
@@ -68,7 +76,7 @@ public class CartItemService implements ICartItemService {
         // 5. If it doesn't exist, throw an exception
 
         Cart cart = cartService.getCart(cartId);
-        Product product = productService.getSingleProduct(productId);
+        Product product = productService.getProductById(productId);
         cart.getCartItems()
                 .stream()
                 .filter(item -> item.getProduct().getId().equals(productId))

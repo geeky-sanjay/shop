@@ -4,11 +4,13 @@ import com.onlineshop.shop.cartandcheckout.models.Cart;
 import com.onlineshop.shop.cartandcheckout.repositories.CartItemRepository;
 import com.onlineshop.shop.cartandcheckout.repositories.CartRepository;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
+import com.onlineshop.shop.user.models.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Service
@@ -43,11 +45,15 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public Long initializeNewCart() {
-        Cart newCart = new Cart();
-        Long newCartId = cartIdGenerator.incrementAndGet();
-        newCart.setId(newCartId);
-        return cartRepository.save(newCart).getId();
+    public Cart initializeNewCart(User user) {
+        return Optional.ofNullable(getCartByUserId(user.getId()))
+                .orElseGet(()->{
+                    Cart cart = new Cart();
+                   // cart.setId(cartIdGenerator.incrementAndGet());
+                    cart.setUser(user);
+                    return cartRepository.save(cart);
+                });
+
     }
 
     @Override

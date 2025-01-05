@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.Set;
 
 @Setter
@@ -15,8 +16,9 @@ import java.util.Set;
 @NoArgsConstructor
 @Entity
 public class Cart extends BaseModel {
-    // private Long userId;
+
     private BigDecimal totalAmount = BigDecimal.ZERO;
+
     // - `mappedBy = "cart"`: The "cart" field in the associated entity owns the relationship.
     // - `cascade = CascadeType.ALL`: Cascades all operations to associated entities.
     // - `orphanRemoval = true`: Removes associated entities if no longer referenced.
@@ -51,4 +53,5 @@ public class Cart extends BaseModel {
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+    
 }
