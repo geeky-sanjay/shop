@@ -5,37 +5,42 @@ import com.onlineshop.shop.checkout.dtos.StripeResponse;
 import com.onlineshop.shop.checkout.services.CheckoutService;
 import com.onlineshop.shop.common.dtos.ApiResponse;
 import com.stripe.exception.StripeException;
-import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.springframework.http.HttpStatus.OK;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${api_prefix}/checkout")
 public class CheckoutController {
+
     private final CheckoutService checkoutService;
 
-    @PostMapping("/create-checkout-session")
-    public ResponseEntity<?> checkoutList(@RequestBody List<CheckoutItemDto> checkoutItemDtoList) throws StripeException {
+    /**
+     * Endpoint to create a payment session for the provided checkout items.
+     *
+     * @param checkoutItemDtoList List of items for the checkout session
+     * @return ResponseEntity containing ApiResponse with Stripe session details or an error message
+     */
+    @PostMapping("/create-session")
+    public ResponseEntity<ApiResponse> createCheckoutSession(@RequestBody List<CheckoutItemDto> checkoutItemDtoList) {
         try {
-            Session session = checkoutService.createSession(checkoutItemDtoList);
-            StripeResponse stripeResponse = new StripeResponse(session.getId());
-            return new ResponseEntity<StripeResponse>(stripeResponse, OK);
-        } catch (StripeException e) {
+            // Create a Stripe checkout session
+            StripeResponse stripeResponse = checkoutService.createSession(checkoutItemDtoList);
+            return ResponseEntity.ok(new ApiResponse("Checkout session created successfully.!", stripeResponse));
+        } catch (StripeException stripeException) {
+
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ApiResponse("Failed to create checkout session: " + e.getMessage(), null));
-        } catch (Exception e) {
+                    .body(new ApiResponse("Stripe error: " + stripeException.getMessage(), null));
+        } catch (Exception exception) {
+            // Handle unexpected errors
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse("An unexpected error occurred: " + e.getMessage(), null));
+                    .body(
+                            new ApiResponse("An unexpected error occurred: " +  exception.getMessage(), null)
+                    );
         }
     }
 }
