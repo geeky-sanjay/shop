@@ -1,10 +1,8 @@
 package com.onlineshop.shop.controllers;
 
-import com.onlineshop.shop.productcatalog.controllers.FakeProductController;
-import com.onlineshop.shop.productcatalog.dtos.ProductResponseSelf;
-import com.onlineshop.shop.productcatalog.exceptions.ProductNotPresentException;
-import com.onlineshop.shop.productcatalog.models.Product;
-import com.onlineshop.shop.productcatalog.services.FakeProductService;
+import com.onlineshop.shop.product.dtos.ProductResponseSelf;
+import com.onlineshop.shop.product.exceptions.ProductNotPresentException;
+import com.onlineshop.shop.product.models.Product;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;

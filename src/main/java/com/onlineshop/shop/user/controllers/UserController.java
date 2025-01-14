@@ -2,7 +2,7 @@ package com.onlineshop.shop.user.controllers;
 
 import com.onlineshop.shop.common.dtos.ApiResponse;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
-import com.onlineshop.shop.user.dtos.SignupRequest;
+import com.onlineshop.shop.user.dtos.CreateUserRequest;
 import com.onlineshop.shop.user.dtos.UserDto;
 import com.onlineshop.shop.user.dtos.UserUpdateRequest;
 import com.onlineshop.shop.user.exceptions.AlreadyExistException;
@@ -33,7 +33,7 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> createUser(@RequestBody SignupRequest request) {
+    public ResponseEntity<ApiResponse> createUser(@RequestBody CreateUserRequest request) {
         try {
             User user = userService.createUser(request);
             UserDto userDto = userService.convertUserToDto(user);

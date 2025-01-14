@@ -1,7 +1,7 @@
 package com.onlineshop.shop.user.services;
 
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
-import com.onlineshop.shop.user.dtos.SignupRequest;
+import com.onlineshop.shop.user.dtos.CreateUserRequest;
 import com.onlineshop.shop.user.dtos.UserDto;
 import com.onlineshop.shop.user.dtos.UserUpdateRequest;
 import com.onlineshop.shop.user.exceptions.AlreadyExistException;
@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -20,6 +21,7 @@ import java.util.Optional;
 public class UserService implements IUserService {
     final UserRepository userRepository;
     final ModelMapper modelMapper;
+    final PasswordEncoder passwordEncoder;
 
     @Override
     public User getUserById(Long userId) {
@@ -28,15 +30,16 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User createUser(SignupRequest request) {
+    public User createUser(CreateUserRequest request) {
         return Optional.of(request)
-                .filter(user -> !userRepository.existsByUsername(request.getEmail()))
+                .filter(user -> !userRepository.existsByEmail(request.getEmail()))
                 .map(userRequest -> {
                     User user = new User();
                     user.setEmail(userRequest.getEmail());
-                    user.setPassword(userRequest.getPassword());
+                    user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
                     user.setFirstName(userRequest.getFirstName());
                     user.setLastName(userRequest.getLastName());
+                    user.setRoles(userRequest.getUserRole());
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new AlreadyExistException("Oops! " + request.getEmail() + " already exists"));

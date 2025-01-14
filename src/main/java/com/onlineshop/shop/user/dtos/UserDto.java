@@ -1,8 +1,8 @@
 package com.onlineshop.shop.user.dtos;
 
 
-import com.onlineshop.shop.cartandcheckout.dtos.CartDto;
-import com.onlineshop.shop.ordermanagement.dtos.OrderDto;
+import com.onlineshop.shop.cart.dtos.CartDto;
+import com.onlineshop.shop.order.dtos.OrderDto;
 import lombok.Data;
 
 import java.util.List;
