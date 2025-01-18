@@ -2,6 +2,7 @@ package com.onlineshop.shop.user.services;
 
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import com.onlineshop.shop.user.dtos.CreateUserRequest;
+import com.onlineshop.shop.user.dtos.ResetPasswordRequestDto;
 import com.onlineshop.shop.user.dtos.UserDto;
 import com.onlineshop.shop.user.dtos.UserUpdateRequest;
 import com.onlineshop.shop.user.exceptions.AlreadyExistException;
@@ -75,5 +76,18 @@ public class UserService implements IUserService {
         Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public void resetPassword(ResetPasswordRequestDto resetPasswordRequestDto) {
+        if (!resetPasswordRequestDto.getNewPassword().equals(resetPasswordRequestDto.getConfirmPassword())) {
+            throw new IllegalArgumentException("Passwords do not match");
+        }
+
+        User user = userRepository.findByEmail(resetPasswordRequestDto.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequestDto.getNewPassword()));
+        userRepository.save(user);
     }
 }

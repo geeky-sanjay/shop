@@ -3,6 +3,7 @@ package com.onlineshop.shop.user.controllers;
 import com.onlineshop.shop.common.dtos.ApiResponse;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import com.onlineshop.shop.user.dtos.CreateUserRequest;
+import com.onlineshop.shop.user.dtos.ResetPasswordRequestDto;
 import com.onlineshop.shop.user.dtos.UserDto;
 import com.onlineshop.shop.user.dtos.UserUpdateRequest;
 import com.onlineshop.shop.user.exceptions.AlreadyExistException;
@@ -62,5 +63,11 @@ public class UserController {
         } catch (ResourceNotFoundException e) {
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequestDto resetPasswordRequestDto) {
+        userService.resetPassword(resetPasswordRequestDto);
+        return ResponseEntity.ok("Password reset successfully");
     }
 }

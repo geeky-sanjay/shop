@@ -1,7 +1,7 @@
 package com.onlineshop.shop.order.services;
 
-import com.onlineshop.shop.cart.models.Cart;
-import com.onlineshop.shop.cart.service.ICartService;
+import com.onlineshop.shop.cartAndCheckout.models.Cart;
+import com.onlineshop.shop.cartAndCheckout.service.ICartService;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
 import com.onlineshop.shop.order.dtos.OrderDto;
 import com.onlineshop.shop.order.models.Order;
@@ -12,7 +12,6 @@ import com.onlineshop.shop.product.models.Product;
 import com.onlineshop.shop.product.repositories.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

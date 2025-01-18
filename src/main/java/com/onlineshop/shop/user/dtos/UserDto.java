@@ -1,7 +1,7 @@
 package com.onlineshop.shop.user.dtos;
 
 
-import com.onlineshop.shop.cart.dtos.CartDto;
+import com.onlineshop.shop.cartAndCheckout.dtos.CartRequestDto;
 import com.onlineshop.shop.order.dtos.OrderDto;
 import lombok.Data;
 
@@ -14,5 +14,5 @@ public class UserDto {
     private String lastName;
     private String email;
     private List<OrderDto> orders;
-    private CartDto cart;
+    private CartRequestDto cart;
 }

@@ -14,15 +14,15 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Entity
-public class Category extends BaseModel {
-    private String name;
-    private String description;
+    public class Category extends BaseModel {
+        private String name;
+        private String description;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "category")
-    private List<Product> products;
+        @JsonIgnore
+        @OneToMany(mappedBy = "category")
+        private List<Product> products;
 
-    public Category(String name) {
-        this.name = name;
+        public Category(String name) {
+            this.name = name;
+        }
     }
-}

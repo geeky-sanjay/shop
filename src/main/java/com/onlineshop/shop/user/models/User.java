@@ -4,7 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
-import com.onlineshop.shop.cart.models.Cart;
+import com.onlineshop.shop.cartAndCheckout.models.Cart;
 import com.onlineshop.shop.common.models.BaseModel;
 import com.onlineshop.shop.order.models.Order;
 import jakarta.persistence.*;

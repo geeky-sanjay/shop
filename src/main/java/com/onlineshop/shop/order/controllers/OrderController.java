@@ -2,19 +2,14 @@ package com.onlineshop.shop.order.controllers;
 
 import com.onlineshop.shop.common.dtos.ApiResponse;
 import com.onlineshop.shop.common.exceptions.ResourceNotFoundException;
-import com.onlineshop.shop.checkout.dtos.CheckoutItemDto;
 import com.onlineshop.shop.order.dtos.OrderDto;
-import com.onlineshop.shop.checkout.dtos.StripeResponse;
 import com.onlineshop.shop.order.models.Order;
 import com.onlineshop.shop.order.services.OrderService;
-import com.stripe.model.checkout.Session;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
-import static org.springframework.http.HttpStatus.OK;
 
 @RequiredArgsConstructor
 @RestController
