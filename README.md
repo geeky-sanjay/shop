@@ -52,6 +52,7 @@ This project is a fully functional e-commerce platform designed to showcase the 
 ## Folder Structure (Based on MVC Pattern)
 ```markdown
 project-root
+├── doc
 ├── src
 │   ├── main
 │   │   ├── java
