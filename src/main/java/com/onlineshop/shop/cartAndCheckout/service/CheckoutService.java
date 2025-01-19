@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.onlineshop.shop.cartAndCheckout.models.PaymentStatus.SUCCESS;
+
 @RequiredArgsConstructor
 @Service
 public class CheckoutService implements ICheckoutService {
@@ -88,7 +90,7 @@ public class CheckoutService implements ICheckoutService {
 
         // Return response
         return StripeResponseDto.builder()
-                .status("success")
+                .status(SUCCESS)
                 .message("Checkout session created successfully.")
                 .sessionId(session.getId())
                 .sessionUrl(session.getUrl())

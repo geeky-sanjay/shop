@@ -10,6 +10,8 @@ import com.onlineshop.shop.user.exceptions.AlreadyExistException;
 import com.onlineshop.shop.user.models.User;
 import com.onlineshop.shop.user.services.IUserService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,14 +23,17 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping("${api_prefix}/users")
 public class UserController {
     private final IUserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @GetMapping("/{userId}/user")
     public ResponseEntity<ApiResponse> getUserById(@PathVariable Long userId) {
         try {
             User user = userService.getUserById(userId);
             UserDto userDto = userService.convertUserToDto(user);
+            logger.info("User fetched successfully for ID: {}", userId);
             return ResponseEntity.ok(new ApiResponse("User fetched successfully", userDto));
         } catch (ResourceNotFoundException e) {
+            logger.error("User not found: {}", e.getMessage());
             return ResponseEntity.status(NOT_FOUND).body(new ApiResponse(e.getMessage(), null));
         }
     }

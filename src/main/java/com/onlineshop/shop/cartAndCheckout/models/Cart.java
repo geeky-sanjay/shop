@@ -1,5 +1,7 @@
 package com.onlineshop.shop.cartAndCheckout.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.onlineshop.shop.common.models.BaseModel;
 import com.onlineshop.shop.user.models.User;
 import jakarta.persistence.*;
@@ -8,6 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.Set;
 
 @Setter
@@ -22,9 +25,10 @@ public class Cart extends BaseModel {
     // - `cascade = CascadeType.ALL`: Cascades all operations to associated entities.
     // - `orphanRemoval = true`: Removes associated entities if no longer referenced.
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CartItem> cartItems;
+    private Set<CartItem> cartItems = new HashSet<>();
 
     // - `mappedBy = "cart"`: The "cart" field in the associated entity owns the relationship.
+    @JsonBackReference // Used to break the infinite recursion problem
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;

@@ -28,7 +28,7 @@ public class CartItemService implements ICartItemService {
         // 3. Check if the product already exists in the cart
         // 4. If it exists, update the quantity
         // 5. If it doesn't exist, add the product to the cart
-
+        System.out.println("Adding item to cart " + productId + quantity);
         Cart cart = cartService.getCart(cartId);
         Product product = productService.getProductById(productId);
         CartItem cartItem = cart.getCartItems()

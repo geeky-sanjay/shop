@@ -9,6 +9,7 @@ import com.onlineshop.shop.user.exceptions.AlreadyExistException;
 import com.onlineshop.shop.user.models.User;
 import com.onlineshop.shop.user.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -68,6 +69,8 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto convertUserToDto(User user) {
+        Hibernate.initialize(user.getOrders()); // Ensure orders are loaded
+        Hibernate.initialize(user.getRoles());  // Ensure roles are loaded
         return modelMapper.map(user, UserDto.class);
     }
 
@@ -75,7 +78,7 @@ public class UserService implements IUserService {
     public User getAuthenticatedUser() {
         Authentication authentication  = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("User not found"));
     }
 
     @Override
@@ -85,7 +88,7 @@ public class UserService implements IUserService {
         }
 
         User user = userRepository.findByEmail(resetPasswordRequestDto.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         user.setPassword(passwordEncoder.encode(resetPasswordRequestDto.getNewPassword()));
         userRepository.save(user);

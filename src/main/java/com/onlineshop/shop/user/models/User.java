@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.onlineshop.shop.cartAndCheckout.models.Cart;
 import com.onlineshop.shop.common.models.BaseModel;
 import com.onlineshop.shop.order.models.Order;
@@ -26,6 +27,7 @@ public class User extends BaseModel {
     private String email;
     private String password;
 
+    @JsonManagedReference // Used to break the infinite recursion problem
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Cart cart;
 

@@ -49,11 +49,29 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request) {
-        String headerAuth = request.getHeader("Authorization");
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            System.out.println("token " + headerAuth.split(" ")[2]);
-            return headerAuth.split(" ")[2].trim();
+        try {
+            String headerAuth = request.getHeader("Authorization");
+
+            // Check if the Authorization header is present and starts with "Bearer "
+            if (StringUtils.hasText(headerAuth)) {
+                String[] parts = headerAuth.split(" ");
+
+                // Check if there are multiple Bearer tokens
+                if (parts.length > 2 || (parts.length == 2 && !parts[0].equals("Bearer"))) {
+                    throw new IllegalArgumentException("Invalid Authorization header: multiple Bearer tokens detected.");
+                }
+
+                // Ensure the first part is "Bearer"
+                if (parts[0].equals("Bearer")) {
+                    return parts[1].trim(); // Return the token, trimming any whitespace
+                }
+            }
+
+            return null; // Return null if no valid token found
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException(e.getMessage());
+        } catch (JwtException e) {
+            throw new RuntimeException("Invalid or expired token");
         }
-        return null;
     }
 }
