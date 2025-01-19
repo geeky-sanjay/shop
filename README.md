@@ -51,25 +51,50 @@ This project is a fully functional e-commerce platform designed to showcase the 
 
 ## Folder Structure (Based on MVC Pattern)
 ```markdown
-project-root
-├── doc
+onlineshop
+├── docs
+│   ├── api-docs
+│   ├── class-diagram
+│   ├── shema-diagram
+│   └── postman-collection
 ├── src
 │   ├── main
 │   │   ├── java
-│   │   │   └── com.example.ecommerce
-│   │   │       ├── controller
-│   │   │       ├── service
-│   │   │       ├── model
-│   │   │       ├── repository
-│   │   │       └── exception
+│   │   │   └── com
+│   │   │       └── onlineshop
+│   │   │           ├── shop
+│   │   │           │   ├── common
+│   │   │           │   │   ├── dtos
+│   │   │           │   │   ├── exceptions
+│   │   │           │   │   ├── models
+│   │   │           │   ├── config
+│   │   │           │   │   ├── GlobalConfig
+│   │   │           │   │   ├── WebConfig
+│   │   │           │   ├── data
+│   │   │           │   │   ├── DataInitializer
+│   │   │           │   │   ├── RoleRepository
+│   │   │           │   ├── cartAndCheckout
+│   │   │           │   │   ├── controllers
+│   │   │           │   │   ├── dtos
+│   │   │           │   │   ├── exceptions
+│   │   │           │   │   ├── models
+│   │   │           │   │   ├── repositories
+│   │   │           │   │   └── services
+│   │   │           │   ├── Auth
+│   │   │           │   │   ├── – -
+│   │   │           │   ├── product
+│   │   │           │   │   ├── - -
+│   │   │           │   ├── order
+│   │   │           │   │   ├── - -
+│   │   │           │   ├── user
+│   │   │           │   │   ├── - -
+│   │   │           └── Application.java
 │   │   └── resources
 │   │       ├── application.properties
-│   │       └── schema.sql
-├── test
-│   └── java
-│       └── com.example.ecommerce
-├── pom.xml
+│   │       └── templates
+│   │           └── index.html
 └── README.md
+└── pom.xml
 ```
 ## Key Highlights
 1. **Stripe Integration:** Implemented for secure and seamless payment processing.
