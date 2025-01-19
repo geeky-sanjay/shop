@@ -4,6 +4,9 @@ import com.onlineshop.shop.cartAndCheckout.dtos.CheckoutItemRequestDto;
 import com.onlineshop.shop.cartAndCheckout.dtos.StripeResponseDto;
 import com.onlineshop.shop.cartAndCheckout.models.PaymentDetails;
 import com.onlineshop.shop.cartAndCheckout.repositories.PaymentRepository;
+import com.onlineshop.shop.order.models.Order;
+import com.onlineshop.shop.order.models.OrderStatus;
+import com.onlineshop.shop.order.repositories.OrderRepository;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
@@ -22,6 +25,7 @@ import static com.onlineshop.shop.cartAndCheckout.models.PaymentStatus.SUCCESS;
 public class CheckoutService implements ICheckoutService {
 
     private final PaymentRepository paymentRepository;
+    private final OrderRepository orderRepository; // Inject OrderRepository
 
     @Value("${baseURL}")
     private String baseURL;
@@ -71,8 +75,6 @@ public class CheckoutService implements ICheckoutService {
         // Build the session parameters
         SessionCreateParams params = SessionCreateParams.builder()
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD)
-                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.US_BANK_ACCOUNT)
-                .addPaymentMethodType(SessionCreateParams.PaymentMethodType.WECHAT_PAY)
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setCancelUrl(failedURL)
                 .addAllLineItem(sessionItemsList)
@@ -88,6 +90,9 @@ public class CheckoutService implements ICheckoutService {
         paymentResponse.setOrderId(checkoutItemDtoList.get(0).getOrderId());
         paymentRepository.save(paymentResponse);
 
+        // Update the order status if payment is successful
+        updateOrderStatus(checkoutItemDtoList.get(0).getOrderId());
+
         // Return response
         return StripeResponseDto.builder()
                 .status(SUCCESS)
@@ -95,5 +100,15 @@ public class CheckoutService implements ICheckoutService {
                 .sessionId(session.getId())
                 .sessionUrl(session.getUrl())
                 .build();
+    }
+
+    /**
+     * Update the status of an order if payment is successful.
+     */
+    private void updateOrderStatus(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + orderId));
+        order.setOrderStatus(OrderStatus.PROCESSING);
+        orderRepository.save(order);
     }
 }
